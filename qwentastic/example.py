@@ -1,4 +1,4 @@
-from qwen_package import qwen_data, qwen_prompt
+from qwentastic import qwen_data, qwen_prompt
 
 def main():
     # Set the background/purpose for Qwen

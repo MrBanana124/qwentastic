@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "qwen-package"
+name = "qwentastic"
 version = "0.1.0"
 description = "A simple interface for running Qwen locally"
 readme = "README.md"
@@ -26,4 +26,4 @@ dependencies = [
 requires-python = ">=3.8"
 
 [project.urls]
-Homepage = "https://github.com/yourusername/qwen-package"
+Homepage = "https://github.com/yourusername/qwentastic"
