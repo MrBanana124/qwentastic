@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "qwentastic"
-version = "0.1.0"
-description = "A simple interface for running Qwen locally"
+version = "0.1.1"
+description = "A simple interface for running Qwen locally with model selection"
 readme = "README.md"
-authors = [{ name = "Your Name", email = "your.email@example.com" }]
+authors = [{ name = "Jacob Kuchinsky", email = "jacob.kuchinsky@gmail.com" }]
 license = { text = "MIT" }
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -18,12 +18,13 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
 ]
-keywords = ["qwen", "ai", "language model"]
+keywords = ["qwen", "ai", "language model", "chat"]
 dependencies = [
     "torch>=2.0.0",
     "transformers>=4.32.0",
+    "accelerate>=0.27.0",
 ]
 requires-python = ">=3.8"
 
 [project.urls]
-Homepage = "https://github.com/yourusername/qwentastic"
+Homepage = "https://github.com/MrBanana124/qwentastic"
