@@ -1,12 +1,12 @@
 # Qwentastic 🚀
 
-A powerful yet simple interface for running Qwen locally. This package provides an elegant way to interact with any Qwen 1.5 model through just three intuitive functions.
+A powerful yet simple interface for running Qwen locally. This package provides an elegant way to interact with any Qwen 1.5 model through three intuitive functions and supports custom function calling.
 
 ## 🌟 Features
 
 - **Simple One-Liner Interface**: Just three functions to remember
   - `qwen_init()`: Choose your Qwen model
-  - `qwen_data()`: Set context and purpose
+  - `qwen_data()`: Set context and register custom functions
   - `qwen_prompt()`: Get AI responses
 - **Multiple Model Support**: 
   - Qwen 1.5 14B
@@ -14,18 +14,15 @@ A powerful yet simple interface for running Qwen locally. This package provides 
   - Qwen 1.5 4B
   - Qwen 1.5 1.8B
   - Qwen 1.5 0.5B
-- **Efficient Model Management**: 
-  - Singleton pattern ensures model loads only once
-  - Automatic resource management
-  - State persistence between calls
-- **Smart Memory Handling**:
-  - Optimized with accelerate for better performance
-  - Automatic device detection and optimization
-  - Efficient model switching
-- **Production Ready**:
-  - Thread-safe implementation
-  - Error handling and recovery
-  - Detailed logging
+- **Custom Function Calling**: 
+  - Define your own functions in OpenAI format
+  - Automatic function execution
+  - Support for complex function chaining
+  - Easy integration with external APIs
+- **Smart Hardware Optimization**:
+  - Automatic GPU detection and selection
+  - Multi-GPU support with optimal device selection
+  - Fallback to CPU when needed
 
 ## 📦 Installation
 
@@ -38,18 +35,46 @@ pip install qwentastic
 ```python
 from qwentastic import qwen_init, qwen_data, qwen_prompt
 
-# Initialize with your chosen model (defaults to 14B if not specified)
-qwen_init("Qwen/Qwen1.5-7B-Chat")  # Choose a smaller model for faster responses
+# Initialize with your chosen model
+qwen_init("Qwen/Qwen1.5-7B-Chat")
 
-# Set the AI's purpose/context
-qwen_data("You are a Python expert focused on writing clean, efficient code")
+# Define custom functions
+functions = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "Get current weather for a location",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "location": {
+                    "type": "string",
+                    "description": "City name"
+                }
+            },
+            "required": ["location"]
+        }
+    }
+}]
 
-# Get responses
-response = qwen_prompt("How do I implement a decorator in Python?")
+# Implement function logic
+def get_weather(location: str):
+    return {
+        "temperature": 72,
+        "condition": "sunny",
+        "location": location
+    }
+
+# Register functions with Qwen
+qwen_data(
+    "You are a helpful AI assistant.",
+    functions=functions,
+    function_map={"get_weather": get_weather}
+)
+
+# Use the functions
+response = qwen_prompt("What's the weather like in San Francisco?")
 print(response)
-
-# Switch to a different model mid-session
-qwen_init("Qwen/Qwen1.5-4B-Chat")  # Switch to an even smaller model
 ```
 
 ## 💻 System Requirements
@@ -74,44 +99,90 @@ Requirements vary by model:
 Common Requirements:
 - Python >= 3.8
 - CUDA-capable GPU recommended (but not required)
+- accelerate >= 0.27.0 (automatically installed)
 
-## ⚡ Performance Notes
+## 🔧 Function Calling Guide
 
-First run will:
-1. Download the selected Qwen model
-2. Cache it locally for future use
-3. Initialize the model (may take a few minutes)
+### Defining Functions
 
-Subsequent runs will be much faster as the model is cached.
-
-## 🔧 Advanced Usage
-
-### Model Selection
+Functions are defined using the OpenAI function calling format:
 
 ```python
-from qwentastic import qwen_init, qwen_data, qwen_prompt
-
-# Available models:
-qwen_init("Qwen/Qwen1.5-14B-Chat")  # Highest quality, slower
-qwen_init("Qwen/Qwen1.5-7B-Chat")   # Good balance
-qwen_init("Qwen/Qwen1.5-4B-Chat")   # Faster
-qwen_init("Qwen/Qwen1.5-1.8B-Chat") # Very fast
-qwen_init("Qwen/Qwen1.5-0.5B-Chat") # Fastest
+functions = [{
+    "type": "function",
+    "function": {
+        "name": "function_name",
+        "description": "What the function does",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "param1": {
+                    "type": "string",
+                    "description": "Parameter description"
+                },
+                "param2": {
+                    "type": "integer",
+                    "description": "Parameter description"
+                }
+            },
+            "required": ["param1"]
+        }
+    }
+}]
 ```
 
-### Temperature Control
+### Implementing Functions
+
+Functions are implemented as regular Python functions and mapped to their definitions:
 
 ```python
-# More deterministic responses
-response = qwen_prompt("Write a function", temperature=0.3)
+def function_name(param1: str, param2: int = 0):
+    # Function implementation
+    return {"result": "some result"}
 
-# More creative responses
-response = qwen_prompt("Write a story", temperature=0.9)
+function_map = {
+    "function_name": function_name
+}
 ```
 
-### Memory Management
+### Registering Functions
 
-The package automatically handles model loading and unloading. You can switch models at any time using `qwen_init()`. The old model will be properly unloaded to free up memory.
+Functions are registered using qwen_data():
+
+```python
+qwen_data(
+    "System prompt here",
+    functions=functions,
+    function_map=function_map
+)
+```
+
+### Complex Function Usage
+
+Functions can be chained and used in complex ways:
+
+```python
+# Define multiple functions
+functions = [
+    weather_function,
+    time_function,
+    calculator_function
+]
+
+# Register all functions
+qwen_data(
+    "You can use these functions together",
+    functions=functions,
+    function_map=function_map
+)
+
+# Use multiple functions in one prompt
+response = qwen_prompt("""
+    1. Get the current time
+    2. Get the weather in New York
+    3. Calculate the temperature in Fahrenheit
+""")
+```
 
 ## 🤝 Contributing
 
@@ -127,7 +198,6 @@ MIT License - feel free to use this in your projects!
 - Model files are cached in the HuggingFace cache directory
 - GPU acceleration requires CUDA support
 - CPU inference is supported but significantly slower
-- Uses accelerate for optimal performance
 
 ## 🔍 Troubleshooting
 
@@ -142,6 +212,11 @@ Common issues and solutions:
    - Check GPU utilization
    - Consider using a smaller model
    - Ensure CUDA is properly installed
+
+3. **Function Calling Issues**:
+   - Verify function definitions match OpenAI format
+   - Check function implementations handle all cases
+   - Ensure required parameters are provided
 
 ## 📚 Citation
 
