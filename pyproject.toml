@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "qwentastic"
-version = "0.1.1"
-description = "A simple interface for running Qwen locally with model selection"
+version = "0.2.0"
+description = "A simple interface for running various LLMs locally with function calling support"
 readme = "README.md"
 authors = [{ name = "Jacob Kuchinsky", email = "jacob.kuchinsky@gmail.com" }]
 license = { text = "MIT" }
@@ -18,11 +18,13 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
 ]
-keywords = ["qwen", "ai", "language model", "chat"]
+keywords = ["qwen", "llama", "deepseek", "ai", "language model", "function calling"]
 dependencies = [
     "torch>=2.0.0",
     "transformers>=4.32.0",
     "accelerate>=0.27.0",
+    "sentencepiece",  # Required for some models like LLaMA
+    "protobuf",      # Required for some models
 ]
 requires-python = ">=3.8"
 
